@@ -16,7 +16,11 @@
           <div class="view">
             <!-- 使用 `v-model` 进行双向绑定，搭配动态绑定类名可以达到联动效果 -->
             <input class="toggle" type="checkbox" v-model="todo.completed">
-            <label>{{ todo.title }}</label>
+            <label @dblclick="todo.isEdit = true">
+              <span v-show="!todo.isEdit">{{ todo.title }}</span>
+              <input class="edit-input" v-show="todo.isEdit" type="text" v-model="todo.title"
+                @keyup.enter="todo.isEdit = false; todo.title = todo.title ? todo.title : '空'" />
+            </label>
             <button class="destroy" @click="removeTodo(todo)"></button>
           </div>
           <input class="edit" value="Create a TodoMVC template">
@@ -46,12 +50,19 @@
       <!-- 如果没有已完成的项，则隐藏这部分 ↓ -->
       <button class="clear-completed" @click="clearCompleted">清除已完成</button>
     </footer>
+
   </section>
 </template>
 
 <style scoped>
 /* 只是导入外部样式，本项目主要内容不在此 */
 @import "https://unpkg.com/todomvc-app-css@2.4.1/index.css";
+
+.edit-input {
+  font-size: 24px;
+  border: 0;
+  padding: 0;
+}
 </style>
 
 <script>
@@ -69,12 +80,14 @@ export default {
         {
           id: 114,
           title: '出发游玩舞萌DX',
-          completed: false
+          completed: false,
+          isEdit: false
         },
         {
           id: 514,
           title: '在家游玩Arcaea',
-          completed: true
+          completed: true,
+          isEdit: false
         }
       ],
       // 表示当前URL的哈希值
@@ -106,7 +119,8 @@ export default {
       this.todos.push({
         id: Date.now(),   // 使用时间戳可以保证id不重复，最好使用随机值代替
         title,
-        completed: false
+        completed: false,
+        isEdit: false
       })
       event.target.value = ''
     },
